@@ -2,7 +2,7 @@
 
 const UserPost = () => {
   return (
-    <div>UserPost</div>
+    <div>UserPost here we can add posts </div>
   )
 }
 
