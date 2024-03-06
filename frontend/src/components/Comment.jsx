@@ -20,7 +20,7 @@ const Comment = ({comment,createAt,likes,username,userAvatar}) => {
             </Text>
             <Flex gap={2} alignItems={"center"}>
               <Text fontSize={"sm"} color={"gray.light"}>
-                {createAt}
+                {createAt} 
               </Text>
               <BsThreeDots />
             </Flex>
