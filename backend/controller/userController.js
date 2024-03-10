@@ -150,7 +150,7 @@ const updateUser = async (req, res) => {
         await cloudinary.uploader.destroy(user.profilePic.split("/").pop().split(".")[0])
       }
       const uploadedResponse = await cloudinary.uploader.upload(profilePic)
-      profilePic = uploadedResponse.secure_url
+      profilePic = uploadedResponse.secure_url;
     }
 
     user.name = name || user.name;
@@ -160,7 +160,12 @@ const updateUser = async (req, res) => {
     user.bio = bio || user.bio;
 
     user = await user.save();
-    res.status(200).json({ message: "Profile updated succesfully", user });
+    
+    //password should be null in response
+    user.password = null;
+
+
+    res.status(200).json( user );
   } catch (error) {
     res.status(500).json({ error: error.mesaage });
     console.log("Error in UpdateUser controller", error.mesaage);

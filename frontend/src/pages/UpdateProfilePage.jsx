@@ -14,6 +14,7 @@ import { useRef, useState } from "react";
 import { useRecoilState } from "recoil";
 import userAtom from "../atoms/userAtom";
 import usePreviewImage from "../hooks/usePreviewImage";
+import useShowToast from "../hooks/useShowToast";
 
 export default function UpdateProfilePage() {
   const [user, setUser] = useRecoilState(userAtom);
@@ -26,8 +27,34 @@ export default function UpdateProfilePage() {
   });
   const fileRef = useRef(null);
 
+  const showToast = useShowToast()
   const {handleImageChange, imgUrl} = usePreviewImage()
+  const handleSubmit = async(e) => {
+    e.preventDefault()
+    try {
+      const res = await fetch(`/api/users/update/${user._id}`,{
+        method:"PUT",
+        headers:{
+          "Content-Type":"application/json",
+          },
+          body: JSON.stringify({...inputs,profilePic:imgUrl})
+      })
+      const data = await res.json(); // updated user object
+      // console.log(data)
+      if(data.error){
+        showToast("Error",data.error,"error")
+        return
+      }
+      showToast("Succes","Profile updated successfully","success")
+      setUser(data);
+      localStorage.setItem("user-threads",JSON.stringify(data))
+    } catch (error) {
+      showToast("Error",error,"error")
+    }
+
+  }
   return (
+    <form onSubmit={handleSubmit}>
     <Flex align={"center"} justify={"center"} my={6}>
       <Stack
         spacing={4}
@@ -54,7 +81,7 @@ export default function UpdateProfilePage() {
             </Center>
           </Stack>
         </FormControl>
-        <FormControl isRequired>
+        <FormControl >
           <FormLabel>Full name</FormLabel>
           <Input
             placeholder="Jhon Doe"
@@ -84,7 +111,7 @@ export default function UpdateProfilePage() {
             onChange={(e) => setInputs({ ...inputs, email: e.target.value })}
           />
         </FormControl>
-        <FormControl isRequired>
+        <FormControl>
           <FormLabel>Bio</FormLabel>
           <Input
             placeholder="your bio"
@@ -94,7 +121,7 @@ export default function UpdateProfilePage() {
             onChange={(e) => setInputs({ ...inputs, bio: e.target.value })}
           />
         </FormControl>
-        <FormControl isRequired>
+        <FormControl >
           <FormLabel>Password</FormLabel>
           <Input
             placeholder="password"
@@ -122,11 +149,13 @@ export default function UpdateProfilePage() {
             _hover={{
               bg: "green.500",
             }}
+            type="submit"
           >
             Submit
           </Button>
         </Stack>
       </Stack>
     </Flex>
+    </form>
   );
 }
