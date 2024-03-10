@@ -16,7 +16,7 @@ const getUserProfile = async(req,res) => {
     console.log("Error in GetUserProfile controller", err.message);
    }
 }
-
+    
 const signupUser = async (req, res) => {
   try {
     const { name, username, email, password } = req.body;
