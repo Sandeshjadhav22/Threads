@@ -1,11 +1,11 @@
 import Post from "../models/postModel.js";
 import User from "../models/userModel.js";
-import {v2 as cloudinay} from "cloudinary"
+import { v2 as cloudinay } from "cloudinary";
 
 const createPost = async (req, res) => {
   try {
     const { postedBy, text } = req.body;
-    let {img} = req.body
+    let { img } = req.body;
 
     if (!postedBy || !text) {
       return res
@@ -27,8 +27,7 @@ const createPost = async (req, res) => {
         .json({ error: `Text must be less than ${maxLenght} character` });
     }
 
-
-    if(img){
+    if (img) {
       const uploadResponse = await cloudinay.uploader.upload(img);
       img = uploadResponse.secure_url;
     }
@@ -107,52 +106,79 @@ const likeUnlikePost = async (req, res) => {
   }
 };
 
+const replyToPost = async (req, res) => {
+  try {
+    const { text } = req.body;
+    const postId = req.params.id;
+    const userId = req.user._id;
+    const userProfilePic = req.user.profilePic;
+    const username = req.user.username;
 
-const replyToPost = async(req,res) => {
- try {
-  const {text} = req.body;
-  const postId = req.params.id;
-  const userId = req.user._id;
-  const userProfilePic = req.user.profilePic;
-  const username = req.user.username;
+    if (!text) {
+      return res.status(400).json({ error: "Text field is required" });
+    }
 
-  if(!text){
-    return res.status(400).json({error:"Text field is required"})
-  }
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res.status(404).json({ error: "Post not found" });
+    }
 
-  const post = await Post.findById(postId)
-  if(!post){
-    return res.status(404).json({error:"Post not found"})
-  }
+    const reply = { userId, text, userProfilePic, username };
 
-  const reply = {userId,text,userProfilePic,username}
+    post.replies.push(reply);
+    await post.save();
 
-  post.replies.push(reply)
-  await post.save()
-  
-  res.status(200).json({message:"reply added succesfully",post})
- } catch (err) {
+    res.status(200).json({ message: "reply added succesfully", post });
+  } catch (err) {
     res.status(500).json({ error: err.message });
     console.log("Error in replyToPost controller", err);
- }
-}
+  }
+};
 
-const getFeedPosts = async(req,res) => {
-try {
+const getFeedPosts = async (req, res) => {
+  try {
     const userId = req.user._id;
-    const user = await User.findById(userId)
+    const user = await User.findById(userId);
 
-    if(!user){
-        return res.status(404).json({error:"user not found"})
+    if (!user) {
+      return res.status(404).json({ error: "user not found" });
     }
 
     const following = user.following;
-    const feedPosts = await Post.find({postedBy: {$in:following}}).sort({createdAt: -1});
+    const feedPosts = await Post.find({ postedBy: { $in: following } }).sort({
+      createdAt: -1,
+    });
 
-    res.status(200).json(feedPosts)
-} catch (err) {
+    res.status(200).json(feedPosts);
+  } catch (err) {
     res.status(500).json({ error: err.message });
     console.log("Error in replyToPost controller", err);
-}
-}
-export { createPost, getPost, deletePost, likeUnlikePost,replyToPost,getFeedPosts };
+  }
+};
+
+const getUserPosts = async (req, res) => {
+  const { username } = req.params;
+  try {
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.status(404).json({ error: "user not found" });
+    }
+    const posts = await Post.find({ postedBy: user._id }).sort({
+      createdAt: -1,
+    });
+
+    res.status(200).json(posts);
+  } catch (error) {
+    res.status(500).json({ error: err.message });
+    console.log("Error in getUserPosts controller", err);
+  }
+};
+export {
+  createPost,
+  getPost,
+  deletePost,
+  likeUnlikePost,
+  replyToPost,
+  getFeedPosts,
+  getUserPosts,
+};
