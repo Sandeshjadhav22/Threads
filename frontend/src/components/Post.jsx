@@ -34,27 +34,27 @@ const Post = ({ post, postedBy }) => {
     getUser();
   }, [postedBy, showToast]);
 
-  const handleDeletePosts = async(e) => {
+  const handleDeletePosts = async (e) => {
     try {
-      e.preventDefault()
-      if(!window.confirm("Are you sure you want to delete this post?")) return
+      e.preventDefault();
+      if (!window.confirm("Are you sure you want to delete this post?")) return;
 
-      const res = await fetch(`/api/posts/${post._id}`,{
-        method:"DELETE",
-        headers:{
-          "Content-Type":"application/json"
+      const res = await fetch(`/api/posts/${post._id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
         },
-      })
-      const data = await res.json()
+      });
+      const data = await res.json();
       if (data.error) {
         showToast("Error", data.error, "error");
         return;
       }
-      showToast("Sucess","Post Deleted","success")
+      showToast("Sucess", "Post Deleted", "success");
     } catch (error) {
       showToast("Error", error.message, "error");
     }
-  }
+  };
 
   if (!user) return null;
   return (
@@ -134,7 +134,9 @@ const Post = ({ post, postedBy }) => {
                 {formatDistanceToNow(new Date(post.createdAt))} ago
               </Text>
 
-              {currentUser?._id === user._id && <DeleteIcon size={20}  onClick={handleDeletePosts}/>}
+              {currentUser?._id === user._id && (
+                <DeleteIcon size={20} onClick={handleDeletePosts} />
+              )}
             </Flex>
           </Flex>
           <Text fontSize={"sm"}>{post.text}</Text>

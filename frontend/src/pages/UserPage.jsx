@@ -4,45 +4,21 @@ import { useParams } from "react-router-dom";
 import useShowToast from "../hooks/useShowToast";
 import { Flex, Spinner } from "@chakra-ui/react";
 import Post from "../components/Post";
+import useGetUserProfile from "../hooks/useGetUserProfile";
 
 const UserPage = () => {
-	const [user, setUser] = useState(null);
+	const {user,loading} = useGetUserProfile()
 	const { username } = useParams();
 	const showToast = useShowToast();
-    const [loading, setloading] = useState(true)
+ 
     const [posts, setPosts] = useState([]);
     const [fetchingPosts, setFetchingPosts] = useState(true)
 
 	useEffect(() => {
-    const getUser = async () => {
-        try {
-            const res = await fetch(`/api/users/profile/${username}`);
-            if (!res.ok) {
-                throw new Error(`HTTP error! Status: ${res.status}`);
-            }
-             
-            const contentType = res.headers.get("content-type");
-            if (contentType && contentType.includes("application/json")) {
-                const data = await res.json();
-                if (data.error) {
-                    showToast("Error", data.error, "error");
-                    console.log(data.error);
-                    return;
-                }      
-                setUser(data);
-            } else {
-                throw new Error("Response is not in JSON format");
-            }
-        } catch (error) {
-            showToast("Error", error.message, "error");
-            console.error(error);
-        }finally{
-            setloading(false)
-        }
-    };
+    
 
     const getPosts = async () => {
-        if (!user) return ; 
+        // if (!user) return ; 
         setFetchingPosts(true);
         try {
             const res = await fetch(`/api/posts/user/${username}`);
@@ -57,7 +33,7 @@ const UserPage = () => {
         }
     };
        
-    getUser();
+   
     getPosts();
 }, [username, setPosts,showToast]);
 
