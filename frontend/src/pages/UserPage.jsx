@@ -20,7 +20,7 @@ const UserPage = () => {
             if (!res.ok) {
                 throw new Error(`HTTP error! Status: ${res.status}`);
             }
-            
+             
             const contentType = res.headers.get("content-type");
             if (contentType && contentType.includes("application/json")) {
                 const data = await res.json();
@@ -28,7 +28,7 @@ const UserPage = () => {
                     showToast("Error", data.error, "error");
                     console.log(data.error);
                     return;
-                }
+                }      
                 setUser(data);
             } else {
                 throw new Error("Response is not in JSON format");
@@ -56,7 +56,7 @@ const UserPage = () => {
             setFetchingPosts(false);
         }
     };
-    
+       
     getUser();
     getPosts();
 }, [username, setPosts,showToast]);
