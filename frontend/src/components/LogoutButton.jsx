@@ -7,7 +7,7 @@ import {FiLogOut} from "react-icons/fi"
 
 const LogoutButton = () => {
   const setUser = useSetRecoilState(userAtom);
-  const showToast = useShowToast
+  const showToast = useShowToast()
   const handleLogout = async () => {
     try {
       //fetch

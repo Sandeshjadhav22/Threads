@@ -35,7 +35,7 @@ const createPost = async (req, res) => {
     const newPost = new Post({ postedBy, text, img });
     await newPost.save();
 
-    res.status(201).json({ message: "Post create succesfully", newPost });
+    res.status(201).json(newPost);
   } catch (err) {
     res.status(500).json({ error: err.message });
     console.log("Error in creatPost controller", err);
@@ -133,7 +133,7 @@ const replyToPost = async (req, res) => {
     post.replies.push(reply);
     await post.save();
 
-    res.status(200).json({ message: "reply added succesfully", post });
+    res.status(200).json(reply);
   } catch (err) {
     res.status(500).json({ error: err.message });
     console.log("Error in replyToPost controller", err);
